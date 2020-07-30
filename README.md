@@ -6,7 +6,13 @@ This plugin only supports iOS >= 13.
 ### Plugin installation
 
 ```
-cordova plugin add https://github.com/tamara-lytvynova/cordova-plugin-sign-in-with-apple.git
+cordova plugin add cordova-plugin-sign-in-with-apple
+```
+
+or
+
+```
+cordova plugin add https://github.com/twogate/cordova-plugin-sign-in-with-apple.git
 ```
 
 # Usage
