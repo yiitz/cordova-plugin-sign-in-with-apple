@@ -72,6 +72,76 @@
   }
 }
 
+- (void)getCredentialState:(CDVInvokedUrlCommand *)command {
+  NSString* userID = command.arguments[0];
+
+  NSLog(@"SignInWithApple getCredentialState()");
+
+  if (@available(iOS 13, *)) {
+    _callbackId = [NSMutableString stringWithString:command.callbackId];
+
+    ASAuthorizationAppleIDProvider *provider =
+       [[ASAuthorizationAppleIDProvider alloc] init];
+
+    if (userID) {
+      NSString* __block status = nil;
+      [provider getCredentialStateForUserID:userID completion:^(ASAuthorizationAppleIDProviderCredentialState credentialState, NSError * _Nullable error) {
+        switch (credentialState) {
+          case ASAuthorizationAppleIDProviderCredentialRevoked:
+             status = @"Revoked";
+             break;
+          case ASAuthorizationAppleIDProviderCredentialAuthorized:
+             status = @"Revoked";
+             break;
+          case ASAuthorizationAppleIDProviderCredentialNotFound:
+             status = @"NotFound";
+             break;
+          case ASAuthorizationAppleIDProviderCredentialTransferred:
+             status = @"Transferred";
+             break;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+          NSLog(@"SignInWithApple state");
+          NSLog(@"%@", status);
+          CDVPluginResult *result =
+            [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                         messageAsDictionary:@{
+                           @"status" : status
+                         }];
+          [self.commandDelegate sendPluginResult:result
+                                      callbackId:command.callbackId];
+       });
+     }];
+    } else {
+      NSLog(@"SignInWithApple getCredentialState() ignored because userID was not provided");
+
+      CDVPluginResult *result =
+          [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                        messageAsDictionary:@{
+                          @"error" : @"PLUGIN_ERROR",
+                          @"code" : @"",
+                          @"localizedDescription" : @"",
+                          @"localizedFailureReason" : @"",
+                        }];
+      [self.commandDelegate sendPluginResult:result
+                                  callbackId:command.callbackId];
+    }
+  } else {
+    NSLog(@"SignInWithApple getCredentialState() ignored because your iOS version < 13");
+
+    CDVPluginResult *result =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                      messageAsDictionary:@{
+                        @"error" : @"PLUGIN_ERROR",
+                        @"code" : @"",
+                        @"localizedDescription" : @"",
+                        @"localizedFailureReason" : @"",
+                      }];
+    [self.commandDelegate sendPluginResult:result
+                                callbackId:command.callbackId];
+  }
+}
+
 - (void)authorizationController:(ASAuthorizationController *)controller
     didCompleteWithAuthorization:(nonnull ASAuthorization *)authorization
     API_AVAILABLE(ios(13.0)) {
