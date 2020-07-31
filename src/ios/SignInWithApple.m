@@ -91,7 +91,7 @@
              status = @"Revoked";
              break;
           case ASAuthorizationAppleIDProviderCredentialAuthorized:
-             status = @"Revoked";
+             status = @"Authorized";
              break;
           case ASAuthorizationAppleIDProviderCredentialNotFound:
              status = @"NotFound";
