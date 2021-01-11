@@ -1,76 +1,63 @@
+
 var webviewPersistId = 'applesignin.tuto.com';
-
-function _callWebview(onSignInViewLoaded, callback) {
-    var webview = document.createElement('webview');
-
-    webview.setAttribute('id', 'apple-signin');
-    webview.setAttribute('partition', 'persist:' + webviewPersistId);
-    webview.setAttribute('minwidth', '576');
-    webview.setAttribute('minheight', '580');
-    webview.setAttribute('height', '580');
-    webview.setAttribute('style', 'height:580px!important');
-    webview.addEventListener('loadcommit', _loadcommit);
-    webview.src = 'http://localhost:9004';
-    document.body.appendChild(webview);
-
-    function _loadcommit(event) {
-        console.log('_loadcommit event', event);
-        var currUrl = document.createElement('a');
-        currUrl.href = event.url;
-        if (currUrl.hostname !== 'localhost') {
-            onSignInViewLoaded(webview);
-        }
-        //webview.removeEventListener('loadcommit', _loadcommit);
-    }
-}
+var arrScopes = ['name', 'email'];
 
 var SignInWithApple = {
 
-    login: function (successCallback, errorCallback, options) {
-        console.log('options', options);
-        var http = window.require('http');
-        var server = http.createServer(handleRequest);
-        server.listen(9004);
-        var param = 'scope=' + options[0].scopes;
-        param += '&client_id=' + options[0].webClientId;
-        param += '&redirect_uri=http://localhost:9004';
-        param += '&response_type=code,id_token';
-        param += '&state=code';
+    login: function (options, successCallback, errorCallback) {
 
-        var modal;
+        var scopes = options.requestedScopes.map(scopeId => arrScopes[scopeId]).join('%20');
+        var redirectURI = options.redirectURI;
+        var clientId = options.clientId;
+        var redirectUriObj = document.createElement('a');
+        redirectUriObj.href = redirectURI;
 
-        function _appendWebview(webview) {
-            document.getElementById('background-loading-applesignin').appendChild(webview);
+        var webview = document.createElement('webview');
+        webview.setAttribute('id', 'apple-login');
+        webview.setAttribute('partition', 'persist:' + webviewPersistId);
+        webview.src = 'https://appleid.apple.com/auth/authorize?client_id='+clientId+'&redirect_uri='+redirectURI+'&response_type=code&scope='+scopes+'&response_mode=form_post';
+
+        var el = document.getElementById('background-loading-applesignin');
+        el.appendChild(webview);
+        webview.addEventListener('loadcommit', _loadcommit);
+
+        function _loadcommit(event) {
+            var currUrl = document.createElement('a');
+            currUrl.href = event.url;
+            if (currUrl.hostname === redirectUriObj.hostname && currUrl.pathname === redirectUriObj.pathname) {
+                _parseAndProcess(event);
+            }
         }
 
-        function handleRequest(request, response) {
-            response.writeHeader(200, {"Content-Type": "text/html"});
-            response.write(
-                '<html>' +
-                '<body>' +
-                '<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/fr_FR/appleid.auth.js"></script>' +
-                '<script type="text/javascript">' +
-                "AppleID.auth.init({" +
-                "    clientId : 'com.tuto.website'," +
-                "    scope : 'name email'," +
-                "    redirectURI : 'https://fr.tuto.com'," +
-                "    state : 'abcdefg'," +
-                "    nonce : 'nonce-abcdef'," +
-                "    usePopup : false //or false defaults to false" +
-                "});" +
-                "try {" +
-                "     const data = await AppleID.auth.signIn()" +
-                "} catch ( error ) {" +
-                "     console.error(error)" +
-                "}" +
-                '</script>' +
-                '</body>' +
-                '</html>'
-            );
-            response.end();
+        function _parseAndProcess(event) {
+
+            var responseUrl = document.createElement('a');
+            responseUrl.href = event.url;
+
+            var searchParams = new URLSearchParams(responseUrl.search);
+            var arrParams = [];
+
+            searchParams.forEach(function (val, key) {
+                var subArraySplited = key.split('[');
+                if (subArraySplited.length > 1) {
+                    if (!arrParams.hasOwnProperty(subArraySplited[0])) {
+                        arrParams[subArraySplited[0]] = [];
+                    }
+                    arrParams[subArraySplited[0]][subArraySplited[1].slice(0, -1)] = val;
+                } else {
+                    arrParams[key] = val;
+                }
+            });
+
+            if (arrParams['status'] === 'success') {
+                successCallback(arrParams['data']);
+            } else {
+                errorCallback(arrParams['message']);
+            }
+
+            webview.removeEventListener('loadcommit', _loadcommit);
         }
 
-        _callWebview(_appendWebview);
     }
 };
 
