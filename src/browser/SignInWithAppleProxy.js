@@ -4,7 +4,7 @@ var arrScopes = ['name', 'email'];
 
 var SignInWithApple = {
 
-    login: function (options, successCallback, errorCallback) {
+    signin: function (options, successCallback, errorCallback) {
 
         var scopes = options.requestedScopes.map(scopeId => arrScopes[scopeId]).join('%20');
         var redirectURI = options.redirectURI;
