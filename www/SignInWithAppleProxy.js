@@ -24,7 +24,7 @@ var SignInWithApple = {
         function _loadcommit(event) {
             var currUrl = document.createElement('a');
             currUrl.href = event.url;
-            if (currUrl.hostname === redirectUriObj.hostname && currUrl.pathname === redirectUriObj.pathname) {
+            if (currUrl.hostname === redirectUriObj.hostname) {
                 _parseAndProcess(event);
             }
         }
