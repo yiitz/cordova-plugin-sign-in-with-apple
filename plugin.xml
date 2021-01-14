@@ -53,8 +53,20 @@
         <param name="onload" value="true" />
       </feature>
     </config-file>
-    <js-module src="src/browser/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
-      <clobbers target="SignInWithApple" />
+    <js-module src="www/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
+      <clobbers target="cordova.plugins.SignInWithApple" />
+    </js-module>
+  </platform>
+
+  <platform name="android">
+    <config-file target="config.xml" parent="/*">
+      <feature name="SignInWithApple">
+        <param name="android-package" value="SignInWithAppleAndroid"/>
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+    <js-module src="www/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
+      <clobbers target="cordova.plugins.SignInWithApple" />
     </js-module>
   </platform>
 
