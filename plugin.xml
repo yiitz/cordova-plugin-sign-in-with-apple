@@ -47,13 +47,13 @@
   </platform>
 
   <platform name="browser">
-    <js-module src="www/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
+    <js-module src="src/browser/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
       <clobbers target="cordova.plugins.SignInWithApple" />
     </js-module>
   </platform>
 
   <platform name="android">
-    <js-module src="www/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
+    <js-module src="src/android/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
       <clobbers target="cordova.plugins.SignInWithApple" />
     </js-module>
   </platform>
