@@ -16,11 +16,11 @@
     <!--<engine name="apple-ios" version=">=13.0" />-->
   </engines>
 
-  <js-module src="www/sign-in-with-apple.js" name="SignInWithApple">
-    <clobbers target="cordova.plugins.SignInWithApple" />
-  </js-module>
-
   <platform name="ios">
+
+    <js-module src="www/sign-in-with-apple.js" name="SignInWithApple">
+      <clobbers target="cordova.plugins.SignInWithApple" />
+    </js-module>
 
     <config-file target="config.xml" parent="/*">
       <feature name="SignInWithApple">
