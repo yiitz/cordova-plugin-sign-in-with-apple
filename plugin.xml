@@ -58,4 +58,10 @@
     </js-module>
   </platform>
 
+  <platform name="electron">
+    <js-module src="src/electron/SignInWithAppleProxy.js" name="SignInWithAppleProxy">
+      <clobbers target="cordova.plugins.SignInWithApple" />
+    </js-module>
+  </platform>
+
 </plugin>
