@@ -13,8 +13,19 @@ var SignInWithApple = {
 
         var view = cordova.InAppBrowser.open('https://appleid.apple.com/auth/authorize?client_id='+clientId+'&redirect_uri='+redirectURI+'&response_type=code%20id_token&scope='+scopes+'&response_mode=fragment','_blank');
 
+        var finished = false;
         view.addEventListener('loadstart', _loadstart);
 
+        view.addEventListener('exit', _exit);
+
+        function _exit(){
+            if (!finished){
+                errorCallback(-1);
+                finished = true;
+                view.removeEventListener('loadstart', _loadstart);
+                view.removeEventListener('exit', _exit);
+            }
+        }
         function _loadstart(event) {
             var currUrl = document.createElement('a');
             currUrl.href = event.url;
@@ -43,7 +54,9 @@ var SignInWithApple = {
                 errorCallback(params);
             }
 
+            finished = true;
             view.removeEventListener('loadstart', _loadstart);
+            view.removeEventListener('exit', _exit);
         }
 
     }
