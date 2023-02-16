@@ -15,7 +15,7 @@ var SignInWithApple = {
         var webview = document.createElement('webview');
         webview.setAttribute('id', 'apple-login');
         webview.setAttribute('partition', 'persist:' + webviewPersistId);
-        webview.src = 'https://appleid.apple.com/auth/authorize?client_id='+clientId+'&redirect_uri='+redirectURI+'&response_type=code&scope='+scopes+'&response_mode=form_post';
+        webview.src = 'https://appleid.apple.com/auth/authorize?client_id='+clientId+'&redirect_uri='+redirectURI+'&response_type=code%20id_token&scope='+scopes+'&response_mode=fragment';
 
         var el = document.getElementById('background-loading-applesignin');
         el.appendChild(webview);
@@ -34,25 +34,19 @@ var SignInWithApple = {
             var responseUrl = document.createElement('a');
             responseUrl.href = event.url;
 
-            var searchParams = new URLSearchParams(responseUrl.search);
-            var arrParams = [];
+            var searchParams = new URLSearchParams(responseUrl.hash.substring(1));
+            var params = {};
 
             searchParams.forEach(function (val, key) {
-                var subArraySplited = key.split('[');
-                if (subArraySplited.length > 1) {
-                    if (!arrParams.hasOwnProperty(subArraySplited[0])) {
-                        arrParams[subArraySplited[0]] = [];
-                    }
-                    arrParams[subArraySplited[0]][subArraySplited[1].slice(0, -1)] = val;
-                } else {
-                    arrParams[key] = val;
-                }
+                params[key]=val;
             });
 
-            if (arrParams['status'] === 'success') {
-                successCallback(arrParams['data']);
+            if (params['code']) {
+                view.close();
+                successCallback(params);
             } else {
-                errorCallback(arrParams['message']);
+                view.close();
+                errorCallback(params);
             }
 
             webview.removeEventListener('load-commit', _loadcommit);
