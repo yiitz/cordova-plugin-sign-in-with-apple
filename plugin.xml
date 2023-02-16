@@ -47,6 +47,10 @@
   </platform>
   <platform name="osx">
 
+    <js-module src="www/sign-in-with-apple.js" name="SignInWithApple">
+      <clobbers target="cordova.plugins.SignInWithApple" />
+    </js-module>
+
     <config-file target="config.xml" parent="/*">
       <feature name="SignInWithApple">
         <param name="ios-package" value="SignInWithApple" />
