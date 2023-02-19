@@ -11,15 +11,15 @@ var SignInWithApple = {
         var redirectUriObj = document.createElement('a');
         redirectUriObj.href = redirectURI;
 
-        var view = cordova.InAppBrowser.open('https://appleid.apple.com/auth/authorize?client_id='+clientId+'&redirect_uri='+redirectURI+'&response_type=code%20id_token&scope='+scopes+'&response_mode=fragment','_blank');
+        var view = cordova.InAppBrowser.open('https://appleid.apple.com/auth/authorize?client_id=' + clientId + '&redirect_uri=' + redirectURI + '&response_type=code%20id_token&scope=' + scopes + '&response_mode=fragment', '_blank', 'location=no,hardwareback=no');
 
         var finished = false;
         view.addEventListener('loadstart', _loadstart);
 
         view.addEventListener('exit', _exit);
 
-        function _exit(){
-            if (!finished){
+        function _exit() {
+            if (!finished) {
                 errorCallback(-1);
                 finished = true;
                 view.removeEventListener('loadstart', _loadstart);
@@ -27,9 +27,7 @@ var SignInWithApple = {
             }
         }
         function _loadstart(event) {
-            var currUrl = document.createElement('a');
-            currUrl.href = event.url;
-            if (currUrl.hostname === redirectUriObj.hostname) {
+            if (event.url.startsWith(redirectUriObj.href)) {
                 _parseAndProcess(event);
             }
         }
@@ -43,7 +41,7 @@ var SignInWithApple = {
             var params = {};
 
             searchParams.forEach(function (val, key) {
-                params[key]=val;
+                params[key] = val;
             });
 
             if (params['code']) {
